@@ -323,7 +323,6 @@
    */
 
 
-
   const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed) => {
     let index = list.indexOf(activeElement); // if the element does not exist in the list return an element depending on the direction and if cycle is allowed
 
