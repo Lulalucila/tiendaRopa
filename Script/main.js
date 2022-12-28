@@ -2,6 +2,7 @@ let carrito = [];
 
 // variable global para saber si esta el producto en pesos o en dls
 let esDolar = false;
+let cantidadEnCarrito = 0;
 
 let productos = [
     { id: 1, titulo: "Remera Blanca", precio: 1000, stock: 0, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/remerablanca.jpg"},
@@ -10,7 +11,7 @@ let productos = [
     { id: 4, titulo: "Remera Azul", precio: 1000, stock: 5, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/remeraazulmarino.jpg" },
     { id: 5, titulo: "Buzo Blanco", precio: 3000, stock: 8, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/buzoblanco.jpg" },
     { id: 6, titulo: "Buzo Gris", precio: 3000, stock: 9, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/buzogris.jpg" },
-    { id: 7, titulo: "Buzo Negro", precio: 3000, stok: 5, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/buzonegro.jpg" },
+    { id: 7, titulo: "Buzo Negro", precio: 3000, stock: 5, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/buzonegro.jpg" },
     { id: 8, titulo: "Buzo Azul", precio: 3000, stok: 0, cantidadComprada: 0, subtotalCompra: 0, imagen: "../imagenes/buzoazulmarino.jpg" },
 ]
 
@@ -42,7 +43,7 @@ function filtrarProducto() {
     const remerasFiltradas = productos.filter((producto) => {
         return producto.titulo.toUpperCase().match(productoRequerido);
     });
-
+    
     generarCards(remerasFiltradas);
 }
 
@@ -55,13 +56,26 @@ function validarStock(producto) {
 }
 
 function existeEnCarrito(producto) {
-    return carrito.find(element => element.id === producto.id);
+    if (carrito != null){
+        return carrito.find(element => element.id === producto.id);
+    }
+    else{
+        return false;
+    }
+    
 }
 
 function btnCompra_onClick(id) {
     const producto = encontrarProductoPorId(id);
     if(validarStock(producto)){
         agregarAlCarrito(producto);
+        // Actualizar el numero en el carrito
+        // Contar cantidad en el carrito
+        cantidadEnCarrito = notificacion(carrito);
+        // Actualizar el numero del carrito
+        document.getElementById("cantidadActualCarrito").innerHTML = cantidadEnCarrito;
+        // Actualizo en local storage el carrito para leerlo desde la pagina de carrito
+        localStorage.setItem("carrito", JSON.stringify(carrito));
         Toastify({
             text: `Añadiste ${producto.titulo}`,
             duration: 1000,
@@ -128,12 +142,23 @@ function generarCards(productosAmostrar){
     }
 }
 
+carrito = JSON.parse(localStorage.getItem("carrito"));
+if (carrito == null){
+    carrito = [];
+    cantidadEnCarrito = 0;
+}
+else{
+    cantidadEnCarrito = notificacion(carrito);
+}
+
+document.getElementById("cantidadActualCarrito").innerHTML = cantidadEnCarrito;
 generarCards(productos);
 
-function sarasa(){
-    let array = [1,2,3,4];
-    let arrayClone = [...array, 5];
-}
+
+// function sarasa(){
+//     let array = [1,2,3,4];
+//     let arrayClone = [...array, 5];
+// }
 
 //api-dolar-argentina.herokuapp.com/api/dolaroficial
 function btnCompra_onDolar(){
@@ -165,3 +190,16 @@ function MyFunction(arrayWebDolar){
     generarCards(productos);
 }
 
+function notificacion(carritoActual){
+    let cantidadTotal = 0;
+    if (carritoActual != null){
+        carritoActual.forEach((elementoEnCarrito) => {
+            cantidadTotal += elementoEnCarrito.cantidadComprada;
+        });
+    }
+    else{
+        ;
+    }
+    
+    return cantidadTotal;
+}
